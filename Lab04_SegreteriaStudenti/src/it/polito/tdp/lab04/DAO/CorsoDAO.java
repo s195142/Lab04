@@ -37,7 +37,9 @@ public class CorsoDAO {
 				System.out.println(codins + " " + numeroCrediti + " " + nome + " " + periodoDidattico);
 
 				// Crea un nuovo JAVA Bean Corso
+				Corso c = new Corso(codins, numeroCrediti, nome, periodoDidattico);
 				// Aggiungi il nuovo oggetto Corso alla lista corsi
+				corsi.add(c);
 			}
 
 			return corsi;
@@ -58,16 +60,57 @@ public class CorsoDAO {
 	/*
 	 * Ottengo tutti gli studenti iscritti al Corso
 	 */
-	public void getStudentiIscrittiAlCorso(Corso corso) {
+	public List<Studente> getStudentiIscrittiAlCorso(Corso corso) {
 		// TODO
+		final String sql = "SELECT matricola FROM iscrizione WHERE codins = ?";
+		List<Studente> studentiIscritti = new LinkedList<Studente>();
+		
+		try {
+			Connection conn = ConnectDB.getConnection();
+			PreparedStatement st = conn.prepareStatement(sql);
+			st.setString(1, corso.getCodins()); // quando c è "?"
+
+			ResultSet rs = st.executeQuery();
+			
+			while (rs.next()) {
+
+				int matricola = rs.getInt("matricola");
+
+				// Crea un nuovo JAVA Bean Corso
+				Studente s = new Studente(matricola);
+				// Aggiungi il nuovo oggetto Corso alla lista corsi
+				studentiIscritti.add(s);
+			}
+			return studentiIscritti;
+		}catch (SQLException e){
+			throw new RuntimeException("Errore DB");
+		}
 	}
 
 	/*
 	 * Data una matricola ed il codice insegnamento, iscrivi lo studente al corso.
 	 */
-	public boolean inscriviStudenteACorso(Studente studente, Corso corso) {
-		// TODO
-		// ritorna true se l'iscrizione e' avvenuta con successo
-		return false;
-	}
+//	public boolean iscriviStudenteACorso(Studente studente, Corso corso) {
+//		String sql = "INSERT IGNORE INTO `iscritticorsi`.`iscrizione` (`matricola`, `codins`) VALUES(?,?)";
+//		boolean iscr = false;
+//		
+//		try {
+//			Connection conn = ConnectDB.getConnection();
+//			PreparedStatement st = conn.prepareStatement(sql);
+//			st.setInt(1, studente.getMatricola());
+//			st.setString(2, corso.getCodins());
+//			
+//			int res = st.executeUpdate();	// ?? cosa cambia da execute query
+//
+//			if (res == 1) // cos'è
+//				iscr = true;
+//
+//			return iscr;
+//
+//		} catch (SQLException e) {
+//			e.printStackTrace();
+//			throw new RuntimeException("Errore Db");
+//		}
+//		
+//	}
 }
